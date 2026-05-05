@@ -50,7 +50,7 @@ CAT_LABELS = {
 BG            = '#ffffff'
 CARD_BG       = '#ffffff'
 PANEL_BG      = '#f9f9f9'
-HEADER_BG     = '#7c3f6e'
+HEADER_BG     = '#6b2844'
 TEXT          = '#1a1a2e'
 TEXT_SEC      = '#555555'
 TEXT_ITALIC   = '#888888'
@@ -64,8 +64,17 @@ BORDER        = '#e8e8e8'
 SHADOW        = '0 2px 8px rgba(0,0,0,0.08)'
 CHART_COLORS  = ['#8b4f7a', '#52b788', '#e05c6a', '#f5a623', '#6baed6', '#c084a0', '#74c476']
 
+_clean_template = go.layout.Template()
+_clean_template.layout = go.Layout(
+    paper_bgcolor='#ffffff',
+    plot_bgcolor='#ffffff',
+    font=dict(color='#333333', family='Inter, Segoe UI, sans-serif'),
+    xaxis=dict(showgrid=True, gridcolor='#f0f0f0', zeroline=False, linecolor='#e8e8e8'),
+    yaxis=dict(showgrid=True, gridcolor='#f0f0f0', zeroline=False, linecolor='#e8e8e8'),
+)
+
 CHART_LAYOUT = dict(
-    template='plotly_white',
+    template=_clean_template,
     paper_bgcolor='#ffffff',
     plot_bgcolor='#ffffff',
     font=dict(color='#333333', family='Inter, Segoe UI, sans-serif'),
@@ -323,12 +332,17 @@ app.layout = html.Div([
                         dcc.Graph(id='t3-meanmedian', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
                     card([
+                        html.H3('Section B2 — Confidence Intervals (95%)', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        nugget('NUGGET: A 95% CI means: if we repeated this study 100 times, 95 of those intervals would contain the true population mean. Wider CI = more uncertainty.'),
+                        html.Div(id='t3-ci-table'),
+                    ]),
+                    card([
                         html.H3('Section C — Grouped Box Plot by Education Level', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         nugget('NUGGET: Does education level influence competitiveness? Compare medians and spreads across groups.'),
                         dcc.Graph(id='t3-edbox', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
                     card([
-                        html.H3('Section E — Coefficient of Variation', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.H3('Section D — Coefficient of Variation', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         nugget('NUGGET: Which variable has the highest relative variability? CV converts SD into percentage form, allowing comparison across different units.'),
                         dcc.Graph(id='t3-cv', config={'displayModeBar': False}, style={'height': '360px'}),
                         html.P('CV is used to compare two datasets with different units. Higher CV = more relative variation.',
@@ -384,6 +398,14 @@ app.layout = html.Div([
                         html.H3('Section C — Normal Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         nugget('NUGGET: The normal distribution is symmetric and bell-shaped. Z-score tells you how many standard deviations x is from the mean.'),
                         html.Div([
+                            html.Span('📌 Data context: Competitiveness Score follows approximately Normal(μ=', style={'fontSize': '12px', 'color': TEXT_SEC}),
+                            html.Span(f"{df['competitiveness_score'].mean():.2f}", style={'fontSize': '12px', 'color': PRIMARY, 'fontWeight': '700'}),
+                            html.Span(', σ=', style={'fontSize': '12px', 'color': TEXT_SEC}),
+                            html.Span(f"{df['competitiveness_score'].std():.2f}", style={'fontSize': '12px', 'color': PRIMARY, 'fontWeight': '700'}),
+                            html.Span('). Default values are pre-filled from the dataset.', style={'fontSize': '12px', 'color': TEXT_SEC}),
+                        ], style={'marginBottom': '14px', 'padding': '10px 14px', 'background': PANEL_BG,
+                                  'borderRadius': '6px', 'border': f'1px solid {BORDER}'}),
+                        html.Div([
                             html.Div([section_label('μ (mean)'),
                                       dcc.Input(id='norm-mu', type='number',
                                                value=round(float(df['competitiveness_score'].mean()), 2), step=0.01,
@@ -395,7 +417,7 @@ app.layout = html.Div([
                                                style={'width': '100%', 'padding': '8px', 'borderRadius': '6px', 'border': f'1px solid {BORDER}', 'fontSize': '14px'})],
                                      style={'flex': '1', 'maxWidth': '200px'}),
                             html.Div([section_label('x value'),
-                                      dcc.Slider(id='norm-x', min=0, max=50, step=0.5, value=25,
+                                      dcc.Slider(id='norm-x', min=0, max=50, step=0.1, value=25,
                                                 marks=None, tooltip={"placement": "bottom", "always_visible": True})],
                                      style={'flex': '2', 'paddingTop': '4px'}),
                         ], style={'display': 'flex', 'gap': '20px', 'marginBottom': '16px', 'alignItems': 'flex-end', 'flexWrap': 'wrap'}),
@@ -412,18 +434,26 @@ app.layout = html.Div([
                 html.Div([
                     card([
                         html.H3('Section A — Simple Linear Regression Explorer', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Which two variables have the strongest linear relationship? The regression line shows the best fit, and R² tells you how well it fits.'),
+                        nugget('NUGGET: Select any independent variable (X) to see its linear relationship with Competitiveness Score (Y). The regression line shows the best fit — R² tells you what % of variation in Y is explained by X.'),
                         html.Div([
-                            html.Div([section_label('X Variable'),
-                                      dcc.Dropdown(id='reg-x',
-                                                   options=[{'label': NUMERIC_LABELS[v], 'value': v} for v in NUMERIC_VARS],
-                                                   value='technical_skill_score', clearable=False, style={'fontSize': '13px'})],
-                                     style={'flex': '1', 'minWidth': '200px'}),
-                            html.Div([section_label('Y Variable'),
-                                      dcc.Dropdown(id='reg-y',
-                                                   options=[{'label': NUMERIC_LABELS[v], 'value': v} for v in NUMERIC_VARS],
-                                                   value='competitiveness_score', clearable=False, style={'fontSize': '13px'})],
-                                     style={'flex': '1', 'minWidth': '200px'}),
+                            html.Div([
+                                section_label('X Variable (Independent)'),
+                                dcc.Dropdown(
+                                    id='reg-x',
+                                    options=[{'label': NUMERIC_LABELS[v], 'value': v}
+                                             for v in NUMERIC_VARS if v != 'competitiveness_score'],
+                                    value='technical_skill_score', clearable=False, style={'fontSize': '13px'}),
+                            ], style={'flex': '1', 'minWidth': '200px'}),
+                            html.Div([
+                                section_label('Y Variable (Dependent)'),
+                                html.Div('Competitiveness Score', style={
+                                    'fontSize': '13px', 'padding': '8px 12px',
+                                    'background': PANEL_BG, 'border': f'1px solid {BORDER}',
+                                    'borderRadius': '6px', 'color': PRIMARY, 'fontWeight': '600',
+                                }),
+                                dcc.Input(id='reg-y', value='competitiveness_score',
+                                          style={'display': 'none'}),
+                            ], style={'flex': '1', 'minWidth': '200px'}),
                         ], style={'display': 'flex', 'gap': '16px', 'marginBottom': '16px', 'flexWrap': 'wrap'}),
                         html.Div([
                             html.Div([dcc.Graph(id='reg-scatter', config={'displayModeBar': False}, style={'height': '360px'})],
@@ -614,6 +644,7 @@ def tab2_qualitative(domains, stages, var):
     Output('t3-boxplot', 'figure'),
     Output('t3-stats-table', 'children'),
     Output('t3-meanmedian', 'figure'),
+    Output('t3-ci-table', 'children'),
     Output('t3-edbox', 'figure'),
     Output('t3-cv', 'figure'),
     Input('t3-var', 'value'),
@@ -694,6 +725,26 @@ def tab3_update(var):
                      annotation_text='Median', annotation_position='top left', annotation_font_color=GREEN)
     fig_mm.update_layout(**CHART_LAYOUT)
 
+    # Confidence Intervals for all numeric variables
+    ci_rows = []
+    for v in NUMERIC_VARS:
+        s = df[v].dropna()
+        s_mean = s.mean()
+        sem = scipy_stats.sem(s)
+        ci_lo, ci_hi = scipy_stats.t.interval(0.95, df=len(s)-1, loc=s_mean, scale=sem)
+        ci_rows.append([
+            NUMERIC_LABELS[v],
+            f'{s_mean:.3f}',
+            f'{s.std():.3f}',
+            f'{ci_lo:.3f}',
+            f'{ci_hi:.3f}',
+            f'{ci_hi - ci_lo:.3f}',
+        ])
+    ci_table = freq_table_html(
+        ['Variable', 'Mean', 'Std Dev', 'CI Lower (95%)', 'CI Upper (95%)', 'CI Width'],
+        ci_rows
+    )
+
     fig_edbox = px.box(df, x='education_level', y='competitiveness_score',
                        color='education_level', title='Competitiveness by Education Level',
                        color_discrete_sequence=CHART_COLORS)
@@ -711,7 +762,7 @@ def tab3_update(var):
                     color_discrete_sequence=[PRIMARY])
     fig_cv.update_layout(**CHART_LAYOUT)
 
-    return fig_box, stats_tbl, fig_mm, fig_edbox, fig_cv
+    return fig_box, stats_tbl, fig_mm, ci_table, fig_edbox, fig_cv
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
