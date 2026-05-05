@@ -123,8 +123,6 @@ def card(children, style=None):
         base.update(style)
     return html.Div(children, style=base)
 
-def nugget(text):
-    return html.P(text, style={'color': TEXT_ITALIC, 'fontStyle': 'italic', 'fontSize': '13px', 'marginBottom': '12px'})
 
 def section_label(text):
     return html.P(text, style={'color': TEXT_SEC, 'fontSize': '13px', 'fontWeight': '600',
@@ -247,22 +245,18 @@ app.layout = html.Div([
                     html.P(id='t1-row-count', style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '13px', 'marginBottom': '14px'}),
                     html.Div(id='t1-metrics', style={'display': 'flex', 'gap': '14px', 'marginBottom': '20px', 'flexWrap': 'wrap'}),
                     html.Div([
-                        html.Div([card([nugget('NUGGET: Which domain attracts the most projects? Does any domain dominate the entrepreneurial landscape?'),
-                                        dcc.Graph(id='t1-pie', config={'displayModeBar': False}, style={'height': '320px'})],
+                        html.Div([card([dcc.Graph(id='t1-pie', config={'displayModeBar': False}, style={'height': '320px'})],
                                        style={'marginBottom': '0', 'height': '100%'})],
                                  style={'flex': '1', 'minWidth': '320px'}),
-                        html.Div([card([nugget('NUGGET: Which funding stage produces the most competitive projects? Look for median differences and spread.'),
-                                        dcc.Graph(id='t1-box', config={'displayModeBar': False}, style={'height': '320px'})],
+                        html.Div([card([dcc.Graph(id='t1-box', config={'displayModeBar': False}, style={'height': '320px'})],
                                        style={'marginBottom': '0', 'height': '100%'})],
                                  style={'flex': '1', 'minWidth': '320px'}),
                     ], style={'display': 'flex', 'gap': '16px', 'marginBottom': '16px', 'alignItems': 'stretch'}),
                     html.Div([
-                        html.Div([card([nugget('NUGGET: Is there a dominant innovation strategy? Disruptive, incremental or radical — which prevails?'),
-                                        dcc.Graph(id='t1-bar', config={'displayModeBar': False}, style={'height': '320px'})],
+                        html.Div([card([dcc.Graph(id='t1-bar', config={'displayModeBar': False}, style={'height': '320px'})],
                                        style={'marginBottom': '0', 'height': '100%'})],
                                  style={'flex': '1', 'minWidth': '320px'}),
-                        html.Div([card([nugget('NUGGET: What is the shape of the competitiveness score distribution? Is it normal, skewed, or uniform?'),
-                                        dcc.Graph(id='t1-hist', config={'displayModeBar': False}, style={'height': '320px'})],
+                        html.Div([card([dcc.Graph(id='t1-hist', config={'displayModeBar': False}, style={'height': '320px'})],
                                        style={'marginBottom': '0', 'height': '100%'})],
                                  style={'flex': '1', 'minWidth': '320px'}),
                     ], style={'display': 'flex', 'gap': '16px', 'alignItems': 'stretch'}),
@@ -275,7 +269,6 @@ app.layout = html.Div([
                     filter_row(('Domain', domain_dd('t2-domain')), ('Funding Stage', stage_dd('t2-stage'))),
                     card([
                         html.H3('Section A — Quantitative Frequency Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: How is the selected numeric variable distributed across the dataset? What does its shape tell us?'),
                         html.Div([section_label('Select Numeric Variable'),
                                   dcc.Dropdown(id='t2-num-var',
                                                options=[{'label': NUMERIC_LABELS[v], 'value': v} for v in NUMERIC_VARS],
@@ -290,7 +283,6 @@ app.layout = html.Div([
                     ]),
                     card([
                         html.H3('Section B — Qualitative Frequency Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Which category dominates? What proportion does each group represent?'),
                         html.Div([section_label('Select Categorical Variable'),
                                   dcc.Dropdown(id='t2-cat-var',
                                                options=[{'label': CAT_LABELS[v], 'value': v} for v in CAT_VARS],
@@ -319,7 +311,6 @@ app.layout = html.Div([
                                     'marginBottom': '16px', 'border': f'1px solid {BORDER}', 'maxWidth': '400px'}),
                     card([
                         html.H3('Section A — Box Plot + Statistical Summary', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Where are the outliers? Is the data symmetric or skewed? What do Q1, Q3 and the fences tell us?'),
                         html.Div([
                             html.Div([dcc.Graph(id='t3-boxplot', config={'displayModeBar': False}, style={'height': '320px'})],
                                      style={'flex': '60', 'minWidth': '280px'}),
@@ -327,24 +318,17 @@ app.layout = html.Div([
                         ], style={'display': 'flex', 'gap': '20px', 'alignItems': 'flex-start'}),
                     ]),
                     card([
-                        html.H3('Section B — Histogram with Mean/Median Lines', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Does the histogram confirm the skewness direction? Where do mean and median fall relative to each other?'),
-                        dcc.Graph(id='t3-meanmedian', config={'displayModeBar': False}, style={'height': '320px'}),
+                        html.H3('Section B — Histogram with Mean/Median Lines', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),dcc.Graph(id='t3-meanmedian', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
                     card([
                         html.H3('Section B2 — Confidence Intervals (95%)', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: A 95% CI means: if we repeated this study 100 times, 95 of those intervals would contain the true population mean. Wider CI = more uncertainty.'),
                         html.Div(id='t3-ci-table'),
                     ]),
                     card([
-                        html.H3('Section C — Grouped Box Plot by Education Level', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Does education level influence competitiveness? Compare medians and spreads across groups.'),
-                        dcc.Graph(id='t3-edbox', config={'displayModeBar': False}, style={'height': '320px'}),
+                        html.H3('Section C — Grouped Box Plot by Education Level', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),dcc.Graph(id='t3-edbox', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
                     card([
-                        html.H3('Section D — Coefficient of Variation', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Which variable has the highest relative variability? CV converts SD into percentage form, allowing comparison across different units.'),
-                        dcc.Graph(id='t3-cv', config={'displayModeBar': False}, style={'height': '360px'}),
+                        html.H3('Section D — Coefficient of Variation', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),dcc.Graph(id='t3-cv', config={'displayModeBar': False}, style={'height': '360px'}),
                         html.P('CV is used to compare two datasets with different units. Higher CV = more relative variation.',
                                style={'fontSize': '12px', 'color': TEXT_ITALIC, 'fontStyle': 'italic', 'marginTop': '8px'}),
                     ]),
@@ -355,50 +339,9 @@ app.layout = html.Div([
             dcc.Tab(label='Probability Distributions', value='tab-4', className='tab', selected_className='tab--selected', children=[
                 html.Div([
                     card([
-                        html.H3('Section A — Binomial Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Given n trials and probability p, what is the chance of exactly k successes? Binomial has two parameters: n and p.'),
+                        html.H3('Section A : Normal Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         html.Div([
-                            html.Div([section_label('n (trials)'),
-                                      dcc.Input(id='binom-n', type='number', value=20, min=1, max=100, step=1,
-                                               style={'width': '100%', 'padding': '8px', 'borderRadius': '6px', 'border': f'1px solid {BORDER}', 'fontSize': '14px'})],
-                                     style={'flex': '1'}),
-                            html.Div([section_label('p (success probability)'),
-                                      dcc.Input(id='binom-p', type='number', value=0.3, min=0.01, max=0.99, step=0.01,
-                                               style={'width': '100%', 'padding': '8px', 'borderRadius': '6px', 'border': f'1px solid {BORDER}', 'fontSize': '14px'})],
-                                     style={'flex': '1'}),
-                            html.Div([section_label('k (successes)'),
-                                      dcc.Slider(id='binom-k', min=0, max=20, step=1, value=6,
-                                                marks=None, tooltip={"placement": "bottom", "always_visible": True})],
-                                     style={'flex': '2', 'paddingTop': '4px'}),
-                        ], style={'display': 'flex', 'gap': '20px', 'marginBottom': '16px', 'alignItems': 'flex-end', 'flexWrap': 'wrap'}),
-                        dcc.Graph(id='binom-chart', config={'displayModeBar': False}, style={'height': '280px'}),
-                        html.Div(id='binom-metrics', style={'display': 'flex', 'gap': '10px', 'marginTop': '14px', 'flexWrap': 'wrap'}),
-                        html.P('P(X=k) = C(n,k) · pᵏ · (1-p)ⁿ⁻ᵏ',
-                               style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '12px', 'marginTop': '10px'}),
-                    ]),
-                    card([
-                        html.H3('Section B — Poisson Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Poisson models the number of events in a fixed interval. It has one parameter: λ (average rate). Mean = Variance = λ.'),
-                        html.Div([
-                            html.Div([section_label('λ (lambda — average rate)'),
-                                      dcc.Input(id='pois-lam', type='number', value=3.0, min=0.1, max=20, step=0.1,
-                                               style={'width': '100%', 'padding': '8px', 'borderRadius': '6px', 'border': f'1px solid {BORDER}', 'fontSize': '14px'})],
-                                     style={'flex': '1', 'maxWidth': '200px'}),
-                            html.Div([section_label('k (number of events)'),
-                                      dcc.Slider(id='pois-k', min=0, max=20, step=1, value=3,
-                                                marks=None, tooltip={"placement": "bottom", "always_visible": True})],
-                                     style={'flex': '2', 'paddingTop': '4px'}),
-                        ], style={'display': 'flex', 'gap': '20px', 'marginBottom': '16px', 'alignItems': 'flex-end', 'flexWrap': 'wrap'}),
-                        dcc.Graph(id='pois-chart', config={'displayModeBar': False}, style={'height': '280px'}),
-                        html.Div(id='pois-metrics', style={'display': 'flex', 'gap': '10px', 'marginTop': '14px', 'flexWrap': 'wrap'}),
-                        html.P('P(X=k) = (e⁻λ · λᵏ) / k!',
-                               style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '12px', 'marginTop': '10px'}),
-                    ]),
-                    card([
-                        html.H3('Section C — Normal Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: The normal distribution is symmetric and bell-shaped. Z-score tells you how many standard deviations x is from the mean.'),
-                        html.Div([
-                            html.Span('📌 Data context: Competitiveness Score follows approximately Normal(μ=', style={'fontSize': '12px', 'color': TEXT_SEC}),
+                            html.Span(' Data context: Competitiveness Score follows approximately Normal(μ=', style={'fontSize': '12px', 'color': TEXT_SEC}),
                             html.Span(f"{df['competitiveness_score'].mean():.2f}", style={'fontSize': '12px', 'color': PRIMARY, 'fontWeight': '700'}),
                             html.Span(', σ=', style={'fontSize': '12px', 'color': TEXT_SEC}),
                             html.Span(f"{df['competitiveness_score'].std():.2f}", style={'fontSize': '12px', 'color': PRIMARY, 'fontWeight': '700'}),
@@ -426,6 +369,44 @@ app.layout = html.Div([
                         html.P('Z = (X − μ) / σ',
                                style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '12px', 'marginTop': '10px'}),
                     ]),
+                    card([
+                        html.H3('Section B : Binomial Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.Div([
+                            html.Div([section_label('n (trials)'),
+                                      dcc.Input(id='binom-n', type='number', value=20, min=1, max=100, step=1,
+                                               style={'width': '100%', 'padding': '8px', 'borderRadius': '6px', 'border': f'1px solid {BORDER}', 'fontSize': '14px'})],
+                                     style={'flex': '1'}),
+                            html.Div([section_label('p (success probability)'),
+                                      dcc.Input(id='binom-p', type='number', value=0.3, min=0.01, max=0.99, step=0.01,
+                                               style={'width': '100%', 'padding': '8px', 'borderRadius': '6px', 'border': f'1px solid {BORDER}', 'fontSize': '14px'})],
+                                     style={'flex': '1'}),
+                            html.Div([section_label('k (successes)'),
+                                      dcc.Slider(id='binom-k', min=0, max=20, step=1, value=6,
+                                                marks=None, tooltip={"placement": "bottom", "always_visible": True})],
+                                     style={'flex': '2', 'paddingTop': '4px'}),
+                        ], style={'display': 'flex', 'gap': '20px', 'marginBottom': '16px', 'alignItems': 'flex-end', 'flexWrap': 'wrap'}),
+                        dcc.Graph(id='binom-chart', config={'displayModeBar': False}, style={'height': '280px'}),
+                        html.Div(id='binom-metrics', style={'display': 'flex', 'gap': '10px', 'marginTop': '14px', 'flexWrap': 'wrap'}),
+                        html.P('P(X=k) = C(n,k) · pᵏ · (1-p)ⁿ⁻ᵏ',
+                               style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '12px', 'marginTop': '10px'}),
+                    ]),
+                    card([
+                        html.H3('Section C : Poisson Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.Div([
+                            html.Div([section_label('λ (lambda — average rate)'),
+                                      dcc.Input(id='pois-lam', type='number', value=3.0, min=0.1, max=20, step=0.1,
+                                               style={'width': '100%', 'padding': '8px', 'borderRadius': '6px', 'border': f'1px solid {BORDER}', 'fontSize': '14px'})],
+                                     style={'flex': '1', 'maxWidth': '200px'}),
+                            html.Div([section_label('k (number of events)'),
+                                      dcc.Slider(id='pois-k', min=0, max=20, step=1, value=3,
+                                                marks=None, tooltip={"placement": "bottom", "always_visible": True})],
+                                     style={'flex': '2', 'paddingTop': '4px'}),
+                        ], style={'display': 'flex', 'gap': '20px', 'marginBottom': '16px', 'alignItems': 'flex-end', 'flexWrap': 'wrap'}),
+                        dcc.Graph(id='pois-chart', config={'displayModeBar': False}, style={'height': '280px'}),
+                        html.Div(id='pois-metrics', style={'display': 'flex', 'gap': '10px', 'marginTop': '14px', 'flexWrap': 'wrap'}),
+                        html.P('P(X=k) = (e⁻λ · λᵏ) / k!',
+                               style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '12px', 'marginTop': '10px'}),
+                    ]),
                 ], style={'padding': '20px'}),
             ]),
 
@@ -434,7 +415,6 @@ app.layout = html.Div([
                 html.Div([
                     card([
                         html.H3('Section A — Simple Linear Regression Explorer', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Select any independent variable (X) to see its linear relationship with Competitiveness Score (Y). The regression line shows the best fit — R² tells you what % of variation in Y is explained by X.'),
                         html.Div([
                             html.Div([
                                 section_label('X Variable (Independent)'),
@@ -463,7 +443,6 @@ app.layout = html.Div([
                     ]),
                     card([
                         html.H3('Section B — Multiple Regression Predictor', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: Using 6 input features, the model predicts competitiveness score. Move the sliders and see how each feature affects the prediction.'),
                         html.Div([
                             html.Div([
                                 html.Div([section_label('Technical Skill Score (0–10)'),
