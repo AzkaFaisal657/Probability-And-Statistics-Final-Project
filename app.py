@@ -6,13 +6,11 @@ import numpy as np
 import scipy.stats as scipy_stats
 from scipy.stats import binom, poisson, norm
 from sklearn.linear_model import LinearRegression
-from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
 
 # ─── Load Data ────────────────────────────────────────────────────────────────
-DATA_PATH = Path(__file__).with_name('student_entrepreneurial_projects.csv')
-df = pd.read_csv(DATA_PATH)
+df = pd.read_csv('student_entrepreneurial_projects.csv')
 
 # Pre-train multiple regression model
 FEATURES = ['technical_skill_score', 'business_skill_score',
@@ -193,20 +191,42 @@ app.layout = html.Div([
 
     html.Div([
         html.Div([
-            html.H1('Student Entrepreneurial Projects Analysis',
-                    style={'color': TEXT_WHITE, 'fontWeight': '700', 'fontSize': '28px', 'marginBottom': '6px'}),
-            html.P('Interactive Dashboard | Probability & Statistics | FAST-NUCES | Spring 2026',
-                   style={'color': 'rgba(255,255,255,0.85)', 'fontSize': '14px', 'marginBottom': '14px'}),
             html.Div([
-                html.Span(' Submitted: May 2026', style={'background': 'rgba(255,255,255,0.2)', 'color': TEXT_WHITE,
-                    'borderRadius': '20px', 'padding': '4px 14px', 'fontSize': '12px', 'marginRight': '10px', 'fontWeight': '500'}),
-                html.Span('Team Leader: Azka Faisal', style={'background': 'rgba(255,255,255,0.2)', 'color': TEXT_WHITE,
-                    'borderRadius': '20px', 'padding': '4px 14px', 'fontSize': '12px', 'marginRight': '10px', 'fontWeight': '500'}),
-                html.Span('Dataset: Student Entrepreneurial Projects (5,000 rows)', style={'background': 'rgba(255,255,255,0.2)',
-                    'color': TEXT_WHITE, 'borderRadius': '20px', 'padding': '4px 14px', 'fontSize': '12px', 'fontWeight': '500'}),
-            ]),
-        ], style={'maxWidth': '1400px', 'margin': '0 auto', 'padding': '0 24px'}),
-    ], style={'background': HEADER_BG, 'padding': '28px 0'}),
+                html.H1('Student Entrepreneurial Projects Analysis',
+                        style={'color': TEXT_WHITE, 'fontWeight': '700', 'fontSize': '36px',
+                               'marginBottom': '10px', 'lineHeight': '1.2'}),
+                html.P('Comprehensive interactive dashboard exploring student entrepreneurial competitiveness patterns. '
+                       'This multi-angle analysis reveals how team composition, market dynamics, skill levels, '
+                       'funding stages, and innovation strategies influence project success enabling data-driven '
+                       'insights through diverse statistical and probabilistic perspectives.',
+                       style={'color': 'rgba(255,255,255,0.82)', 'fontSize': '14px',
+                              'lineHeight': '1.6', 'marginBottom': '18px', 'maxWidth': '780px'}),
+                html.Div([
+                    html.Span([
+                        html.Span(' ', style={'marginRight': '5px'}),
+                        html.Span('Submitted: ', style={'fontWeight': '600'}),
+                        'May 2026'
+                    ], style={'background': 'rgba(255,255,255,0.18)', 'color': TEXT_WHITE,
+                        'borderRadius': '6px', 'padding': '5px 14px', 'fontSize': '12px',
+                        'marginRight': '10px', 'display': 'inline-flex', 'alignItems': 'center'}),
+                    html.Span([
+                        html.Span(' ', style={'marginRight': '5px'}),
+                        html.Span('Team Leader: ', style={'fontWeight': '600'}),
+                        'Azka Faisal'
+                    ], style={'background': 'rgba(255,255,255,0.18)', 'color': TEXT_WHITE,
+                        'borderRadius': '6px', 'padding': '5px 14px', 'fontSize': '12px',
+                        'marginRight': '10px', 'display': 'inline-flex', 'alignItems': 'center'}),
+                    html.Span([
+                        html.Span(' ', style={'marginRight': '5px'}),
+                        html.Span('Data Source: ', style={'fontWeight': '600'}),
+                        'Student Entrepreneurial Projects (5,000 rows)'
+                    ], style={'background': 'rgba(255,255,255,0.18)', 'color': TEXT_WHITE,
+                        'borderRadius': '6px', 'padding': '5px 14px', 'fontSize': '12px',
+                        'display': 'inline-flex', 'alignItems': 'center'}),
+                ]),
+            ], style={'maxWidth': '960px'}),
+        ], style={'padding': '40px 40px 36px 40px'}),
+    ], style={'background': HEADER_BG, 'width': '100%'}),
 
     html.Div([
         dcc.Tabs(id='main-tabs', value='tab-1', children=[
@@ -303,14 +323,7 @@ app.layout = html.Div([
                         dcc.Graph(id='t3-meanmedian', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
                     card([
-                        html.H3('Section C — Violin Plot (Qualitative-wise Quantitative)', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        nugget('NUGGET: How does competitiveness vary across domains? This is qualitative-wise quantitative analysis.'),
-                        dcc.Graph(id='t3-violin', config={'displayModeBar': False}, style={'height': '360px'}),
-                        html.P('Qualitative-wise Quantitative Analysis: Used when comparing a quantitative variable across categories to find group differences.',
-                               style={'fontSize': '12px', 'color': TEXT_ITALIC, 'fontStyle': 'italic', 'marginTop': '8px'}),
-                    ]),
-                    card([
-                        html.H3('Section D — Grouped Box Plot by Education Level', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.H3('Section C — Grouped Box Plot by Education Level', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         nugget('NUGGET: Does education level influence competitiveness? Compare medians and spreads across groups.'),
                         dcc.Graph(id='t3-edbox', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
@@ -467,7 +480,7 @@ app.layout = html.Div([
             ]),
 
         ], style={'borderBottom': f'1px solid {BORDER}'}),
-    ], style={'maxWidth': '1400px', 'margin': '0 auto', 'padding': '0 24px'}),
+    ], style={'padding': '0 40px'}),
 
     html.Div([
         html.P('Probability & Statistics | FAST-NUCES | Spring 2026 | Interactive Data Analysis Dashboard',
@@ -601,7 +614,6 @@ def tab2_qualitative(domains, stages, var):
     Output('t3-boxplot', 'figure'),
     Output('t3-stats-table', 'children'),
     Output('t3-meanmedian', 'figure'),
-    Output('t3-violin', 'figure'),
     Output('t3-edbox', 'figure'),
     Output('t3-cv', 'figure'),
     Input('t3-var', 'value'),
@@ -630,10 +642,23 @@ def tab3_update(var):
         skew_val, kurt_val = 0.0, 0.0
 
     fig_box = go.Figure()
-    fig_box.add_trace(go.Box(x=series, boxpoints='outliers',
-                             marker=dict(color=RED, size=5),
-                             line=dict(color=PRIMARY), fillcolor=PRIMARY_LIGHT, name=label))
-    fig_box.update_layout(**CHART_LAYOUT, title='Box Plot with Outlier Detection')
+    fig_box.add_trace(go.Box(
+        x=series,
+        boxpoints='outliers',
+        marker=dict(color=RED, size=5, opacity=0.6),
+        line=dict(color=PRIMARY, width=1.5),
+        fillcolor='rgba(192, 132, 160, 0.25)',
+        name=label,
+        hovertemplate='%{x:.2f}<extra></extra>',
+    ))
+    fig_box.update_layout(
+        **CHART_LAYOUT,
+        title='Box Plot with Outlier Detection',
+        xaxis=dict(title=label),
+        yaxis=dict(showticklabels=False),
+        hoverlabel=dict(bgcolor='white', font_size=12, font_family='Inter, Segoe UI, sans-serif',
+                        bordercolor=BORDER),
+    )
 
     stat_rows_data = [
         ('Mean', f'{mean:.4f}'), ('Median', f'{median:.4f}'),
@@ -669,12 +694,6 @@ def tab3_update(var):
                      annotation_text='Median', annotation_position='top left', annotation_font_color=GREEN)
     fig_mm.update_layout(**CHART_LAYOUT)
 
-    fig_vio = px.violin(df, x='project_domain', y='competitiveness_score',
-                        color='project_domain', box=True,
-                        title='Competitiveness Distribution by Domain (Violin Plot)',
-                        color_discrete_sequence=CHART_COLORS)
-    fig_vio.update_layout(**CHART_LAYOUT, showlegend=False)
-
     fig_edbox = px.box(df, x='education_level', y='competitiveness_score',
                        color='education_level', title='Competitiveness by Education Level',
                        color_discrete_sequence=CHART_COLORS)
@@ -692,12 +711,33 @@ def tab3_update(var):
                     color_discrete_sequence=[PRIMARY])
     fig_cv.update_layout(**CHART_LAYOUT)
 
-    return fig_box, stats_tbl, fig_mm, fig_vio, fig_edbox, fig_cv
+    return fig_box, stats_tbl, fig_mm, fig_edbox, fig_cv
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # CALLBACKS — TAB 4
 # ═══════════════════════════════════════════════════════════════════════════════
+
+@app.callback(
+    Output('binom-k', 'max'),
+    Input('binom-n', 'value'),
+)
+def update_binom_k_max(n):
+    return int(n or 20)
+
+
+@app.callback(
+    Output('norm-x', 'min'),
+    Output('norm-x', 'max'),
+    Output('norm-x', 'value'),
+    Input('norm-mu', 'value'),
+    Input('norm-sigma', 'value'),
+)
+def update_norm_x_range(mu, sigma):
+    mu = float(mu or df['competitiveness_score'].mean())
+    sigma = max(float(sigma or df['competitiveness_score'].std()), 0.01)
+    return round(mu - 4 * sigma, 2), round(mu + 4 * sigma, 2), round(mu, 2)
+
 
 @app.callback(
     Output('binom-chart', 'figure'),
