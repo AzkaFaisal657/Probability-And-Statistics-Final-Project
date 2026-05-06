@@ -13,7 +13,7 @@ warnings.filterwarnings('ignore')
 df = pd.read_csv('student_entrepreneurial_projects.csv')
 
 # Pre-train multiple regression model
-FEATURES = ['technical_skill_score', 'business_skill_score',
+FEATURES = ['mentor_feedback_score', 'technical_skill_score', 'business_skill_score',
             'avg_team_experience', 'team_size',
             'market_growth_rate', 'competition_level']
 X_all = df[FEATURES]
@@ -24,7 +24,7 @@ NUMERIC_VARS = [
     'competitiveness_score', 'market_size_usd', 'market_growth_rate',
     'team_size', 'technical_skill_score', 'business_skill_score',
     'social_media_mentions', 'mentor_feedback_score',
-    'avg_team_experience', 'competition_level'
+    'avg_team_experience', 'competition_level', 'user_interest_score'
 ]
 NUMERIC_LABELS = {
     'competitiveness_score': 'Competitiveness Score',
@@ -37,6 +37,7 @@ NUMERIC_LABELS = {
     'mentor_feedback_score': 'Mentor Feedback Score',
     'avg_team_experience': 'Avg Team Experience',
     'competition_level': 'Competition Level',
+    'user_interest_score': 'User Interest Score',
 }
 CAT_VARS = ['project_domain', 'funding_stage', 'innovation_type', 'education_level']
 CAT_LABELS = {
@@ -245,18 +246,22 @@ app.layout = html.Div([
                     html.P(id='t1-row-count', style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '13px', 'marginBottom': '14px'}),
                     html.Div(id='t1-metrics', style={'display': 'flex', 'gap': '14px', 'marginBottom': '20px', 'flexWrap': 'wrap'}),
                     html.Div([
-                        html.Div([card([dcc.Graph(id='t1-pie', config={'displayModeBar': False}, style={'height': '320px'})],
+                        html.Div([card([
+                                        dcc.Graph(id='t1-pie', config={'displayModeBar': False}, style={'height': '320px'})],
                                        style={'marginBottom': '0', 'height': '100%'})],
                                  style={'flex': '1', 'minWidth': '320px'}),
-                        html.Div([card([dcc.Graph(id='t1-box', config={'displayModeBar': False}, style={'height': '320px'})],
+                        html.Div([card([
+                                        dcc.Graph(id='t1-box', config={'displayModeBar': False}, style={'height': '320px'})],
                                        style={'marginBottom': '0', 'height': '100%'})],
                                  style={'flex': '1', 'minWidth': '320px'}),
                     ], style={'display': 'flex', 'gap': '16px', 'marginBottom': '16px', 'alignItems': 'stretch'}),
                     html.Div([
-                        html.Div([card([dcc.Graph(id='t1-bar', config={'displayModeBar': False}, style={'height': '320px'})],
+                        html.Div([card([
+                                        dcc.Graph(id='t1-bar', config={'displayModeBar': False}, style={'height': '320px'})],
                                        style={'marginBottom': '0', 'height': '100%'})],
                                  style={'flex': '1', 'minWidth': '320px'}),
-                        html.Div([card([dcc.Graph(id='t1-hist', config={'displayModeBar': False}, style={'height': '320px'})],
+                        html.Div([card([
+                                        dcc.Graph(id='t1-hist', config={'displayModeBar': False}, style={'height': '320px'})],
                                        style={'marginBottom': '0', 'height': '100%'})],
                                  style={'flex': '1', 'minWidth': '320px'}),
                     ], style={'display': 'flex', 'gap': '16px', 'alignItems': 'stretch'}),
@@ -318,17 +323,22 @@ app.layout = html.Div([
                         ], style={'display': 'flex', 'gap': '20px', 'alignItems': 'flex-start'}),
                     ]),
                     card([
-                        html.H3('Section B — Histogram with Mean/Median Lines', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),dcc.Graph(id='t3-meanmedian', config={'displayModeBar': False}, style={'height': '320px'}),
+                        html.H3('Section B — Histogram with Mean/Median Lines', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        dcc.Graph(id='t3-meanmedian', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
                     card([
                         html.H3('Section B2 — Confidence Intervals (95%)', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.P('95% CI: We are 95% confident the true population mean lies within this range.',
+                               style={'fontSize': '12px', 'color': TEXT_ITALIC, 'fontStyle': 'italic', 'marginBottom': '12px'}),
                         html.Div(id='t3-ci-table'),
                     ]),
                     card([
-                        html.H3('Section C — Grouped Box Plot by Education Level', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),dcc.Graph(id='t3-edbox', config={'displayModeBar': False}, style={'height': '320px'}),
+                        html.H3('Section C — Grouped Box Plot by Education Level', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        dcc.Graph(id='t3-edbox', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
                     card([
-                        html.H3('Section D — Coefficient of Variation', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),dcc.Graph(id='t3-cv', config={'displayModeBar': False}, style={'height': '360px'}),
+                        html.H3('Section E — Coefficient of Variation', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        dcc.Graph(id='t3-cv', config={'displayModeBar': False}, style={'height': '360px'}),
                         html.P('CV is used to compare two datasets with different units. Higher CV = more relative variation.',
                                style={'fontSize': '12px', 'color': TEXT_ITALIC, 'fontStyle': 'italic', 'marginTop': '8px'}),
                     ]),
@@ -339,15 +349,7 @@ app.layout = html.Div([
             dcc.Tab(label='Probability Distributions', value='tab-4', className='tab', selected_className='tab--selected', children=[
                 html.Div([
                     card([
-                        html.H3('Section A : Normal Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        html.Div([
-                            html.Span(' Data context: Competitiveness Score follows approximately Normal(μ=', style={'fontSize': '12px', 'color': TEXT_SEC}),
-                            html.Span(f"{df['competitiveness_score'].mean():.2f}", style={'fontSize': '12px', 'color': PRIMARY, 'fontWeight': '700'}),
-                            html.Span(', σ=', style={'fontSize': '12px', 'color': TEXT_SEC}),
-                            html.Span(f"{df['competitiveness_score'].std():.2f}", style={'fontSize': '12px', 'color': PRIMARY, 'fontWeight': '700'}),
-                            html.Span('). Default values are pre-filled from the dataset.', style={'fontSize': '12px', 'color': TEXT_SEC}),
-                        ], style={'marginBottom': '14px', 'padding': '10px 14px', 'background': PANEL_BG,
-                                  'borderRadius': '6px', 'border': f'1px solid {BORDER}'}),
+                        html.H3('Section A — Normal Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         html.Div([
                             html.Div([section_label('μ (mean)'),
                                       dcc.Input(id='norm-mu', type='number',
@@ -360,7 +362,7 @@ app.layout = html.Div([
                                                style={'width': '100%', 'padding': '8px', 'borderRadius': '6px', 'border': f'1px solid {BORDER}', 'fontSize': '14px'})],
                                      style={'flex': '1', 'maxWidth': '200px'}),
                             html.Div([section_label('x value'),
-                                      dcc.Slider(id='norm-x', min=0, max=50, step=0.1, value=25,
+                                      dcc.Slider(id='norm-x', min=0, max=50, step=0.5, value=25,
                                                 marks=None, tooltip={"placement": "bottom", "always_visible": True})],
                                      style={'flex': '2', 'paddingTop': '4px'}),
                         ], style={'display': 'flex', 'gap': '20px', 'marginBottom': '16px', 'alignItems': 'flex-end', 'flexWrap': 'wrap'}),
@@ -370,7 +372,7 @@ app.layout = html.Div([
                                style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '12px', 'marginTop': '10px'}),
                     ]),
                     card([
-                        html.H3('Section B : Binomial Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.H3('Section B — Binomial Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         html.Div([
                             html.Div([section_label('n (trials)'),
                                       dcc.Input(id='binom-n', type='number', value=20, min=1, max=100, step=1,
@@ -391,7 +393,7 @@ app.layout = html.Div([
                                style={'fontStyle': 'italic', 'color': TEXT_ITALIC, 'fontSize': '12px', 'marginTop': '10px'}),
                     ]),
                     card([
-                        html.H3('Section C : Poisson Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.H3('Section C — Poisson Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         html.Div([
                             html.Div([section_label('λ (lambda — average rate)'),
                                       dcc.Input(id='pois-lam', type='number', value=3.0, min=0.1, max=20, step=0.1,
@@ -422,7 +424,7 @@ app.layout = html.Div([
                                     id='reg-x',
                                     options=[{'label': NUMERIC_LABELS[v], 'value': v}
                                              for v in NUMERIC_VARS if v != 'competitiveness_score'],
-                                    value='technical_skill_score', clearable=False, style={'fontSize': '13px'}),
+                                    value='mentor_feedback_score', clearable=False, style={'fontSize': '13px'}),
                             ], style={'flex': '1', 'minWidth': '200px'}),
                             html.Div([
                                 section_label('Y Variable (Dependent)'),
@@ -445,6 +447,10 @@ app.layout = html.Div([
                         html.H3('Section B — Multiple Regression Predictor', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         html.Div([
                             html.Div([
+                                html.Div([section_label('Mentor Feedback Score (1–10)'),
+                                          dcc.Slider(1, 10, 1, value=5, id='sl-mentor',
+                                                    marks={i: str(i) for i in range(1, 11, 2)},
+                                                    tooltip={"placement": "bottom", "always_visible": True})], style={'marginBottom': '24px'}),
                                 html.Div([section_label('Technical Skill Score (0–10)'),
                                           dcc.Slider(0, 10, 1, value=5, id='sl-tech',
                                                     marks={i: str(i) for i in range(0, 11, 2)},
@@ -477,7 +483,7 @@ app.layout = html.Div([
                                         'fontSize': '12px', 'fontWeight': '500', 'marginBottom': '8px', 'textAlign': 'center'}),
                                     html.Div(id='pred-output', style={'fontSize': '42px', 'fontWeight': '700',
                                         'color': TEXT_WHITE, 'textAlign': 'center'}),
-                                    html.P('/ 50.00', style={'textAlign': 'center', 'color': 'rgba(255,255,255,0.6)',
+                                    html.P(f'out of {df["competitiveness_score"].max():.2f} (dataset max)', style={'textAlign': 'center', 'color': 'rgba(255,255,255,0.6)',
                                         'fontSize': '14px', 'marginTop': '4px'}),
                                 ], style={'background': f'linear-gradient(135deg, {PRIMARY} 0%, {HEADER_BG} 100%)',
                                           'borderRadius': '12px', 'padding': '30px 20px', 'marginBottom': '16px'}),
@@ -530,7 +536,7 @@ def tab1_update(domains, stages, innovations):
     row_count = f'{n:,} / 5,000 rows'
     metrics = [
         metric_card('Total Projects', f'{n:,}'),
-        metric_card('Avg Competitiveness', f"{dff['competitiveness_score'].mean():.2f} / 50"),
+        metric_card('Avg Competitiveness', f"{dff['competitiveness_score'].mean():.2f}"),
         metric_card('Avg Team Size', f"{dff['team_size'].mean():.1f} members"),
         metric_card('Avg Market Growth', f"{dff['market_growth_rate'].mean():.1f}%"),
         metric_card('Unique Domains', dff['project_domain'].nunique()),
@@ -663,7 +669,7 @@ def tab3_update(var):
     ))
     fig_box.update_layout(
         **CHART_LAYOUT,
-        title='Box Plot with Outlier Detection',
+        title=f'Box Plot with Outlier Detection — {label}',
         xaxis=dict(title=label),
         yaxis=dict(showticklabels=False),
         hoverlabel=dict(bgcolor='white', font_size=12, font_family='Inter, Segoe UI, sans-serif',
@@ -704,7 +710,7 @@ def tab3_update(var):
                      annotation_text='Median', annotation_position='top left', annotation_font_color=GREEN)
     fig_mm.update_layout(**CHART_LAYOUT)
 
-    # Confidence Intervals for all numeric variables
+    # 95% Confidence Intervals for all numeric variables
     ci_rows = []
     for v in NUMERIC_VARS:
         s = df[v].dropna()
@@ -929,6 +935,7 @@ def tab5_regression(x_var, y_var):
 @app.callback(
     Output('pred-output', 'children'),
     Output('pred-scatter', 'figure'),
+    Input('sl-mentor', 'value'),
     Input('sl-tech', 'value'),
     Input('sl-bus', 'value'),
     Input('sl-exp', 'value'),
@@ -936,17 +943,19 @@ def tab5_regression(x_var, y_var):
     Input('sl-growth', 'value'),
     Input('sl-comp', 'value'),
 )
-def tab5_predict(tech, bus, exp, team, growth, comp):
-    input_df = pd.DataFrame([[tech, bus, exp, team, growth, comp]], columns=FEATURES)
+def tab5_predict(mentor, tech, bus, exp, team, growth, comp):
+    input_df = pd.DataFrame([[mentor, tech, bus, exp, team, growth, comp]], columns=FEATURES)
     pred = float(reg_model.predict(input_df)[0])
-    pred = max(0, min(50, pred))
+    score_min = float(df['competitiveness_score'].min())
+    score_max = float(df['competitiveness_score'].max())
+    pred = max(score_min, min(score_max, pred))
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df['technical_skill_score'], y=df['competitiveness_score'],
+    fig.add_trace(go.Scatter(x=df['mentor_feedback_score'], y=df['competitiveness_score'],
                              mode='markers', marker=dict(color=PRIMARY_LIGHT, size=4, opacity=0.4), name='Actual data'))
-    fig.add_trace(go.Scatter(x=[tech], y=[pred], mode='markers',
+    fig.add_trace(go.Scatter(x=[mentor], y=[pred], mode='markers',
                              marker=dict(color=RED, size=16, symbol='star'), name='Your prediction'))
-    fig.update_layout(**CHART_LAYOUT, title='Technical Skill Score vs Competitiveness (your prediction as ★)',
-                      xaxis_title='Technical Skill Score', yaxis_title='Competitiveness Score')
+    fig.update_layout(**CHART_LAYOUT, title='Mentor Feedback Score vs Competitiveness (★ = your prediction)',
+                      xaxis_title='Mentor Feedback Score', yaxis_title='Competitiveness Score')
     return f'{pred:.2f}', fig
 
 
