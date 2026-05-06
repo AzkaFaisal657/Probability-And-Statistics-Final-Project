@@ -227,7 +227,7 @@ app.layout = html.Div([
                     html.Span([
                         html.Span(' ', style={'marginRight': '5px'}),
                         html.Span('Data Source: ', style={'fontWeight': '600'}),
-                        'Student Entrepreneurial Projects (5,000 rows)'
+                        'Student Entrepreneurial Projects'
                     ], style={'background': 'rgba(255,255,255,0.18)', 'color': TEXT_WHITE,
                         'borderRadius': '6px', 'padding': '5px 14px', 'fontSize': '12px',
                         'display': 'inline-flex', 'alignItems': 'center'}),
