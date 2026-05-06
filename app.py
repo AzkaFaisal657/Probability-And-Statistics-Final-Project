@@ -746,6 +746,7 @@ def tab3_update(var):
                     title='Coefficient of Variation (%) — Comparing Relative Variability Across Variables',
                     color_discrete_sequence=[PRIMARY])
     fig_cv.update_layout(**CHART_LAYOUT)
+    fig_cv.update_layout(margin=dict(t=50, l=200, r=30, b=50))
 
     return fig_box, stats_tbl, fig_mm, ci_table, fig_edbox, fig_cv
 
