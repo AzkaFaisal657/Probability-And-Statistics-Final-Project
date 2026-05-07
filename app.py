@@ -72,12 +72,7 @@ RED           = '#e05c6a'
 AMBER         = '#f5a623'
 BORDER        = '#e8e8e8'
 SHADOW        = '0 2px 8px rgba(0,0,0,0.08)'
-CHART_COLORS  = [
-    '#8b4f7a', '#52b788', '#e05c6a', '#f5a623', '#6baed6',
-    '#c084a0', '#74c476', '#d4a017', '#5e81ac', '#a3be8c',
-    '#bf616a', '#88c0d0', '#ebcb8b', '#b48ead', '#4c8f72',
-    '#e07b54', '#7a86c8', '#c9a85c', '#6d9e6a', '#d08770',
-]
+CHART_COLORS  = ['#8b4f7a', '#52b788', '#e05c6a', '#f5a623', '#6baed6', '#c084a0', '#74c476']
 
 _clean_template = go.layout.Template()
 _clean_template.layout = go.Layout(
@@ -687,16 +682,12 @@ def tab3_update(var):
                         bordercolor=BORDER),
     )
     fig_box.update_layout(margin=dict(t=160, l=50, r=30, b=60))
-    _has_lower_out = float(series.min()) < lower_fence
-    _has_upper_out = float(series.max()) > upper_fence
-    _lbl_low  = f'<b>Lower Fence</b><br>{lower_fence:.2f}' if _has_lower_out else f'<b>Min</b><br>{lower_whisker:.2f}'
-    _lbl_high = f'<b>Upper Fence</b><br>{upper_fence:.2f}' if _has_upper_out else f'<b>Max</b><br>{upper_whisker:.2f}'
     for _xv, _txt in [
-        (lower_whisker, _lbl_low),
+        (lower_whisker, f'<b>Lower Fence</b><br>{lower_fence:.2f}'),
         (q1,            f'<b>Q1</b><br>{q1:.2f}'),
         (median,        f'<b>Median</b><br>{median:.2f}'),
         (q3,            f'<b>Q3</b><br>{q3:.2f}'),
-        (upper_whisker, _lbl_high),
+        (upper_whisker, f'<b>Upper Fence</b><br>{upper_fence:.2f}'),
     ]:
         fig_box.add_annotation(
             x=_xv, xref='x',
