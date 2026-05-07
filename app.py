@@ -678,12 +678,14 @@ def tab3_update(var):
                         bordercolor=BORDER),
     )
     fig_box.update_layout(margin=dict(t=140, l=50, r=30, b=50))
+    lower_whisker = float(series[series >= lower_fence].min())
+    upper_whisker = float(series[series <= upper_fence].max())
     for _xv, _txt in [
-        (lower_fence, f'<b>Lower Fence</b><br>{lower_fence:.2f}'),
-        (q1,          f'<b>Q1</b><br>{q1:.2f}'),
-        (median,      f'<b>Median</b><br>{median:.2f}'),
-        (q3,          f'<b>Q3</b><br>{q3:.2f}'),
-        (upper_fence, f'<b>Upper Fence</b><br>{upper_fence:.2f}'),
+        (lower_whisker, f'<b>Lower Fence</b><br>{lower_fence:.2f}'),
+        (q1,            f'<b>Q1</b><br>{q1:.2f}'),
+        (median,        f'<b>Median</b><br>{median:.2f}'),
+        (q3,            f'<b>Q3</b><br>{q3:.2f}'),
+        (upper_whisker, f'<b>Upper Fence</b><br>{upper_fence:.2f}'),
     ]:
         fig_box.add_annotation(
             x=_xv, xref='x',
