@@ -556,7 +556,8 @@ def tab1_update(domains, stages, innovations):
     bar_data = dff['innovation_type'].value_counts().reset_index()
     bar_data.columns = ['innovation_type', 'count']
     fig_bar = px.bar(bar_data, x='innovation_type', y='count',
-                     title='Projects by Innovation Type', color_discrete_sequence=[PRIMARY])
+                     title='Projects by Innovation Type')
+    fig_bar.update_traces(marker_color=[CHART_COLORS[i % len(CHART_COLORS)] for i in range(len(bar_data))])
     fig_bar.update_layout(**CHART_LAYOUT)
 
     fig_hist = px.histogram(dff, x='competitiveness_score', nbins=25,
@@ -606,8 +607,8 @@ def tab2_qualitative(domains, stages, var):
     counts = dff[var].value_counts().reset_index()
     counts.columns = [var, 'count']
     total = counts['count'].sum()
-    fig_bar = px.bar(counts, x=var, y='count', title=f'Count by {CAT_LABELS[var]}',
-                     color_discrete_sequence=[PRIMARY])
+    fig_bar = px.bar(counts, x=var, y='count', title=f'Count by {CAT_LABELS[var]}')
+    fig_bar.update_traces(marker_color=[CHART_COLORS[i % len(CHART_COLORS)] for i in range(len(counts))])
     fig_bar.update_layout(**CHART_LAYOUT)
     fig_pie = px.pie(counts, names=var, values='count', title=f'Distribution of {CAT_LABELS[var]}',
                      color_discrete_sequence=CHART_COLORS)
@@ -743,8 +744,8 @@ def tab3_update(var):
     cv_df = pd.DataFrame(list(cv_data.items()), columns=['Variable', 'CV (%)'])
     cv_df = cv_df.sort_values('CV (%)', ascending=True)
     fig_cv = px.bar(cv_df, x='CV (%)', y='Variable', orientation='h',
-                    title='Coefficient of Variation (%) — Comparing Relative Variability Across Variables',
-                    color_discrete_sequence=[PRIMARY])
+                    title='Coefficient of Variation (%) — Comparing Relative Variability Across Variables')
+    fig_cv.update_traces(marker_color=[CHART_COLORS[i % len(CHART_COLORS)] for i in range(len(cv_df))])
     fig_cv.update_layout(**CHART_LAYOUT)
     fig_cv.update_layout(margin=dict(t=50, l=200, r=30, b=50))
 
