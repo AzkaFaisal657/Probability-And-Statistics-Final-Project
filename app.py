@@ -72,7 +72,12 @@ RED           = '#e05c6a'
 AMBER         = '#f5a623'
 BORDER        = '#e8e8e8'
 SHADOW        = '0 2px 8px rgba(0,0,0,0.08)'
-CHART_COLORS  = ['#8b4f7a', '#52b788', '#e05c6a', '#f5a623', '#6baed6', '#c084a0', '#74c476']
+CHART_COLORS  = [
+    '#8b4f7a', '#52b788', '#e05c6a', '#f5a623', '#6baed6',
+    '#c084a0', '#74c476', '#d4a017', '#5e81ac', '#a3be8c',
+    '#bf616a', '#88c0d0', '#ebcb8b', '#b48ead', '#4c8f72',
+    '#e07b54', '#7a86c8', '#c9a85c', '#6d9e6a', '#d08770',
+]
 
 _clean_template = go.layout.Template()
 _clean_template.layout = go.Layout(
