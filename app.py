@@ -39,6 +39,15 @@ NUMERIC_LABELS = {
     'competition_level': 'Competition Level',
     'user_interest_score': 'User Interest Score',
 }
+CONTINUOUS_VARS = [
+    'competitiveness_score', 'market_size_usd', 'market_growth_rate', 'avg_team_experience'
+]
+CONTINUOUS_LABELS = {
+    'competitiveness_score': 'Competitiveness Score',
+    'market_size_usd': 'Market Size (USD)',
+    'market_growth_rate': 'Market Growth Rate (%)',
+    'avg_team_experience': 'Avg Team Experience',
+}
 CAT_VARS = ['project_domain', 'funding_stage', 'innovation_type', 'education_level']
 CAT_LABELS = {
     'project_domain': 'Project Domain',
@@ -310,6 +319,13 @@ app.layout = html.Div([
                     ]),
                     card([
                         html.H3('Section B — Histogram with Mean/Median Lines', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.Div([section_label('Select Continuous Variable'),
+                                  dcc.Dropdown(id='t3-hist-var',
+                                               options=[{'label': CONTINUOUS_LABELS[v], 'value': v} for v in CONTINUOUS_VARS],
+                                               value=CONTINUOUS_VARS[0], clearable=False,
+                                               style={'fontSize': '13px'})],
+                                 style={'background': PANEL_BG, 'borderRadius': '8px', 'padding': '14px 16px',
+                                        'marginBottom': '16px', 'border': f'1px solid {BORDER}', 'maxWidth': '400px'}),
                         dcc.Graph(id='t3-meanmedian', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
                     card([
@@ -566,7 +582,7 @@ def tab1_update(domains, stages, innovations):
 def tab2_quantitative(domains, stages, var):
     dff = filter_df(domains, stages)
     series = dff[var].dropna()
-    fig = px.histogram(series, nbins=25, title=f'{NUMERIC_LABELS[var]} — Histogram',
+    fig = px.histogram(x=series, nbins=25, title=f'{NUMERIC_LABELS[var]} — Histogram',
                        color_discrete_sequence=[PRIMARY])
     fig.update_layout(**CHART_LAYOUT)
     labels_cut, _ = pd.cut(series, bins=8, retbins=True)
@@ -615,7 +631,6 @@ def tab2_qualitative(domains, stages, var):
 @app.callback(
     Output('t3-boxplot', 'figure'),
     Output('t3-stats-table', 'children'),
-    Output('t3-meanmedian', 'figure'),
     Output('t3-ci-table', 'children'),
     Output('t3-edbox', 'figure'),
     Output('t3-cv', 'figure'),
@@ -651,8 +666,8 @@ def tab3_update(var):
         marker=dict(color=RED, size=5, opacity=0.6),
         line=dict(color=PRIMARY, width=1.5),
         fillcolor='rgba(192, 132, 160, 0.25)',
-        name=label,
-        hovertemplate='%{x:.2f}<extra></extra>',
+        name='',
+        hoverinfo='skip',
     ))
     fig_box.update_layout(
         **CHART_LAYOUT,
@@ -662,6 +677,26 @@ def tab3_update(var):
         hoverlabel=dict(bgcolor='white', font_size=12, font_family='Inter, Segoe UI, sans-serif',
                         bordercolor=BORDER),
     )
+    fig_box.update_layout(margin=dict(t=140, l=50, r=30, b=50))
+    for _xv, _txt in [
+        (lower_fence, f'<b>Lower Fence</b><br>{lower_fence:.2f}'),
+        (q1,          f'<b>Q1</b><br>{q1:.2f}'),
+        (median,      f'<b>Median</b><br>{median:.2f}'),
+        (q3,          f'<b>Q3</b><br>{q3:.2f}'),
+        (upper_fence, f'<b>Upper Fence</b><br>{upper_fence:.2f}'),
+    ]:
+        fig_box.add_annotation(
+            x=_xv, xref='x',
+            y=0.5, yref='paper',
+            text=_txt,
+            showarrow=True, arrowhead=2,
+            arrowcolor=PRIMARY, arrowsize=0.8, arrowwidth=1.5,
+            ax=0, ay=-90,
+            font=dict(size=9, color=TEXT),
+            bgcolor='rgba(255,255,255,0.95)',
+            bordercolor=PRIMARY, borderwidth=1, borderpad=4,
+            align='center',
+        )
 
     stat_rows_data = [
         ('Mean', f'{mean:.4f}'), ('Median', f'{median:.4f}'),
@@ -688,14 +723,6 @@ def tab3_update(var):
                 style={'padding': '7px 10px', 'fontSize': '12px', 'border': f'1px solid {BORDER}', 'background': '#ffffff'}),
     ]))
     stats_tbl = html.Table(html.Tbody(tbl_rows), style={'width': '100%', 'borderCollapse': 'collapse'})
-
-    fig_mm = px.histogram(df, x=var, nbins=30, title=f'Distribution Shape — Mean vs Median ({label})',
-                          color_discrete_sequence=[PRIMARY])
-    fig_mm.add_vline(x=mean, line_dash='dash', line_color=RED,
-                     annotation_text='Mean', annotation_position='top right', annotation_font_color=RED)
-    fig_mm.add_vline(x=median, line_dash='dash', line_color=GREEN,
-                     annotation_text='Median', annotation_position='top left', annotation_font_color=GREEN)
-    fig_mm.update_layout(**CHART_LAYOUT)
 
     # 95% Confidence Intervals for all numeric variables
     ci_rows = []
@@ -735,7 +762,29 @@ def tab3_update(var):
     fig_cv.update_layout(**CHART_LAYOUT)
     fig_cv.update_layout(margin=dict(t=50, l=200, r=30, b=50))
 
-    return fig_box, stats_tbl, fig_mm, ci_table, fig_edbox, fig_cv
+    return fig_box, stats_tbl, ci_table, fig_edbox, fig_cv
+
+
+@app.callback(
+    Output('t3-meanmedian', 'figure'),
+    Input('t3-hist-var', 'value'),
+)
+def tab3_histogram(var):
+    series = df[var].dropna()
+    label = CONTINUOUS_LABELS[var]
+    mean = float(series.mean())
+    median = float(series.median())
+    fig_mm = px.histogram(x=series, nbins=30,
+                          title=f'Distribution Shape — Mean vs Median ({label})',
+                          color_discrete_sequence=[PRIMARY])
+    fig_mm.add_vline(x=mean, line_dash='dash', line_color=RED,
+                     annotation_text='Mean', annotation_position='top right',
+                     annotation_font_color=RED)
+    fig_mm.add_vline(x=median, line_dash='dash', line_color=GREEN,
+                     annotation_text='Median', annotation_position='top left',
+                     annotation_font_color=GREEN)
+    fig_mm.update_layout(**CHART_LAYOUT)
+    return fig_mm
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
