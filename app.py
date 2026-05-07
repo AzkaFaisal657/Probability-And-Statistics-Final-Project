@@ -302,15 +302,14 @@ app.layout = html.Div([
             # ── TAB 3: EDA ───────────────────────────────────────────────────
             dcc.Tab(label='EDA & Shape of Data', value='tab-3', className='tab', selected_className='tab--selected', children=[
                 html.Div([
-                    html.Div([section_label('Select Numeric Variable'),
-                              dcc.Dropdown(id='t3-var',
-                                           options=[{'label': NUMERIC_LABELS[v], 'value': v} for v in NUMERIC_VARS],
-                                           value='competitiveness_score', clearable=False,
-                                           style={'fontSize': '13px'})],
-                             style={'background': PANEL_BG, 'borderRadius': '8px', 'padding': '14px 16px',
-                                    'marginBottom': '16px', 'border': f'1px solid {BORDER}', 'maxWidth': '400px'}),
                     card([
-                        html.H3('Section A — Box Plot + Statistical Summary', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        html.H3('Section A — Box Plot + Statistical Summary', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '12px'}),
+                        html.Div([section_label('Select Numeric Variable'),
+                                  dcc.Dropdown(id='t3-var',
+                                               options=[{'label': NUMERIC_LABELS[v], 'value': v} for v in NUMERIC_VARS],
+                                               value='competitiveness_score', clearable=False,
+                                               style={'fontSize': '13px'})],
+                                 style={'marginBottom': '16px', 'maxWidth': '400px'}),
                         html.Div([
                             html.Div([dcc.Graph(id='t3-boxplot', config={'displayModeBar': False}, style={'height': '380px'})],
                                      style={'flex': '60', 'minWidth': '280px'}),
