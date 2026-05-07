@@ -219,13 +219,15 @@ app.layout = html.Div([
                        style={'color': 'rgba(255,255,255,0.82)', 'fontSize': '14px',
                               'lineHeight': '1.6', 'marginBottom': '18px', 'maxWidth': '780px'}),
                 html.Div([
-                    html.Span([
-                        html.Span(' ', style={'marginRight': '5px'}),
+                    html.A([
+                        html.Span('↗', style={'marginRight': '6px', 'fontSize': '11px'}),
                         html.Span('Data Source: ', style={'fontWeight': '600'}),
                         'Student Entrepreneurial Projects'
-                    ], style={'background': 'rgba(255,255,255,0.18)', 'color': TEXT_WHITE,
+                    ], href='/view-data', target='_blank',
+                       style={'background': 'rgba(255,255,255,0.18)', 'color': TEXT_WHITE,
                         'borderRadius': '6px', 'padding': '5px 14px', 'fontSize': '12px',
-                        'display': 'inline-flex', 'alignItems': 'center'}),
+                        'display': 'inline-flex', 'alignItems': 'center',
+                        'cursor': 'pointer', 'textDecoration': 'none'}),
                 ]),
             ], style={'maxWidth': '960px'}),
         ], style={'padding': '40px 40px 36px 40px'}),
@@ -997,6 +999,44 @@ def tab5_predict(mentor, tech, bus, exp, team, growth, comp):
     fig.update_layout(**CHART_LAYOUT, title='Mentor Feedback Score vs Competitiveness (★ = your prediction)',
                       xaxis_title='Mentor Feedback Score', yaxis_title='Competitiveness Score')
     return f'{pred:.2f}', fig
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FLASK ROUTE — DATA VIEWER
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@server.route('/view-data')
+def view_data():
+    from flask import Response
+    html_table = df.to_html(classes='data-table', index=False, border=0)
+    page = f'''
+<!DOCTYPE html><html>
+<head>
+  <meta charset='utf-8'>
+  <title>Student Entrepreneurial Projects — Dataset</title>
+  <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
+  <style>
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{ font-family: Inter, Segoe UI, sans-serif; background: #f9f9f9; color: #1a1a2e; }}
+    .header {{ background: #6b2844; color: white; padding: 24px 32px; }}
+    .header h1 {{ font-size: 22px; font-weight: 700; margin-bottom: 4px; }}
+    .header p {{ font-size: 13px; opacity: 0.8; }}
+    .container {{ padding: 24px 32px; overflow-x: auto; }}
+    .data-table {{ border-collapse: collapse; width: 100%; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 12px; }}
+    .data-table th {{ background: #8b4f7a; color: white; padding: 10px 12px; text-align: left; font-weight: 600; white-space: nowrap; position: sticky; top: 0; }}
+    .data-table td {{ padding: 7px 12px; border-bottom: 1px solid #e8e8e8; white-space: nowrap; }}
+    .data-table tr:nth-child(even) td {{ background: #f9f9f9; }}
+    .data-table tr:hover td {{ background: #f0e6ec; }}
+  </style>
+</head>
+<body>
+  <div class='header'>
+    <h1>Student Entrepreneurial Projects — Dataset</h1>
+    <p>{len(df):,} rows &times; {len(df.columns)} columns</p>
+  </div>
+  <div class='container'>{html_table}</div>
+</body></html>'''
+    return Response(page, mimetype='text/html')
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
