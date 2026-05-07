@@ -312,7 +312,7 @@ app.layout = html.Div([
                     card([
                         html.H3('Section A — Box Plot + Statistical Summary', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         html.Div([
-                            html.Div([dcc.Graph(id='t3-boxplot', config={'displayModeBar': False}, style={'height': '320px'})],
+                            html.Div([dcc.Graph(id='t3-boxplot', config={'displayModeBar': False}, style={'height': '380px'})],
                                      style={'flex': '60', 'minWidth': '280px'}),
                             html.Div([html.Div(id='t3-stats-table')], style={'flex': '40', 'minWidth': '240px'}),
                         ], style={'display': 'flex', 'gap': '20px', 'alignItems': 'flex-start'}),
@@ -582,9 +582,9 @@ def tab1_update(domains, stages, innovations):
 def tab2_quantitative(domains, stages, var):
     dff = filter_df(domains, stages)
     series = dff[var].dropna()
-    fig = px.histogram(x=series, nbins=25, title=f'{NUMERIC_LABELS[var]} — Histogram',
-                       color_discrete_sequence=[PRIMARY])
-    fig.update_layout(**CHART_LAYOUT)
+    fig = go.Figure(go.Histogram(x=series.tolist(), nbinsx=25, marker_color=PRIMARY))
+    fig.update_layout(**CHART_LAYOUT, title=f'{NUMERIC_LABELS[var]} — Histogram',
+                      xaxis_title=NUMERIC_LABELS[var], yaxis_title='Count')
     labels_cut, _ = pd.cut(series, bins=8, retbins=True)
     freq = labels_cut.value_counts().sort_index()
     total = freq.sum()
@@ -653,6 +653,8 @@ def tab3_update(var):
     lower_fence = q1 - 1.5 * iqr
     upper_fence = q3 + 1.5 * iqr
     outliers = int(((series < lower_fence) | (series > upper_fence)).sum())
+    lower_whisker = float(series[series >= lower_fence].min())
+    upper_whisker = float(series[series <= upper_fence].max())
     try:
         skew_val = float(scipy_stats.skew(series))
         kurt_val = float(scipy_stats.kurtosis(series))
@@ -669,23 +671,27 @@ def tab3_update(var):
         name='',
         hoverinfo='skip',
     ))
+    _w_span = upper_whisker - lower_whisker
+    _x_pad = _w_span * 0.18
     fig_box.update_layout(
         **CHART_LAYOUT,
         title=f'Box Plot with Outlier Detection — {label}',
-        xaxis=dict(title=label),
+        xaxis=dict(title=label, range=[lower_whisker - _x_pad, upper_whisker + _x_pad]),
         yaxis=dict(showticklabels=False),
         hoverlabel=dict(bgcolor='white', font_size=12, font_family='Inter, Segoe UI, sans-serif',
                         bordercolor=BORDER),
     )
-    fig_box.update_layout(margin=dict(t=140, l=50, r=30, b=50))
-    lower_whisker = float(series[series >= lower_fence].min())
-    upper_whisker = float(series[series <= upper_fence].max())
+    fig_box.update_layout(margin=dict(t=160, l=50, r=30, b=60))
+    _has_lower_out = float(series.min()) < lower_fence
+    _has_upper_out = float(series.max()) > upper_fence
+    _lbl_low  = f'<b>Lower Fence</b><br>{lower_fence:.2f}' if _has_lower_out else f'<b>Min</b><br>{lower_whisker:.2f}'
+    _lbl_high = f'<b>Upper Fence</b><br>{upper_fence:.2f}' if _has_upper_out else f'<b>Max</b><br>{upper_whisker:.2f}'
     for _xv, _txt in [
-        (lower_whisker, f'<b>Lower Fence</b><br>{lower_fence:.2f}'),
+        (lower_whisker, _lbl_low),
         (q1,            f'<b>Q1</b><br>{q1:.2f}'),
         (median,        f'<b>Median</b><br>{median:.2f}'),
         (q3,            f'<b>Q3</b><br>{q3:.2f}'),
-        (upper_whisker, f'<b>Upper Fence</b><br>{upper_fence:.2f}'),
+        (upper_whisker, _lbl_high),
     ]:
         fig_box.add_annotation(
             x=_xv, xref='x',
@@ -776,9 +782,9 @@ def tab3_histogram(var):
     label = CONTINUOUS_LABELS[var]
     mean = float(series.mean())
     median = float(series.median())
-    fig_mm = px.histogram(x=series, nbins=30,
-                          title=f'Distribution Shape — Mean vs Median ({label})',
-                          color_discrete_sequence=[PRIMARY])
+    fig_mm = go.Figure(go.Histogram(x=series.tolist(), nbinsx=30, marker_color=PRIMARY))
+    fig_mm.update_layout(**CHART_LAYOUT, title=f'Distribution Shape — Mean vs Median ({label})',
+                          xaxis_title=label, yaxis_title='Count')
     fig_mm.add_vline(x=mean, line_dash='dash', line_color=RED,
                      annotation_text='Mean', annotation_position='top right',
                      annotation_font_color=RED)
