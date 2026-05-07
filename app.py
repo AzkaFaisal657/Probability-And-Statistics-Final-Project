@@ -72,7 +72,7 @@ RED           = '#e05c6a'
 AMBER         = '#f5a623'
 BORDER        = '#e8e8e8'
 SHADOW        = '0 2px 8px rgba(0,0,0,0.08)'
-CHART_COLORS  = ['#8b4f7a', '#52b788', '#e05c6a', '#f5a623', '#6baed6', '#c084a0', '#74c476']
+CHART_COLORS  = ['#8b4f7a', '#52b788', '#e05c6a', '#f5a623', '#6baed6', '#c084a0', '#74c476', '#d4631a', '#5e81ac', '#a3be8c', '#9b59b6', '#16a085']
 
 _clean_template = go.layout.Template()
 _clean_template.layout = go.Layout(
@@ -683,11 +683,11 @@ def tab3_update(var):
     )
     fig_box.update_layout(margin=dict(t=160, l=50, r=30, b=60))
     for _xv, _txt in [
-        (lower_whisker, f'<b>Lower Fence</b><br>{lower_fence:.2f}'),
+        (lower_whisker, f'<b>Min</b><br>{series.min():.2f}'),
         (q1,            f'<b>Q1</b><br>{q1:.2f}'),
         (median,        f'<b>Median</b><br>{median:.2f}'),
         (q3,            f'<b>Q3</b><br>{q3:.2f}'),
-        (upper_whisker, f'<b>Upper Fence</b><br>{upper_fence:.2f}'),
+        (upper_whisker, f'<b>Max</b><br>{series.max():.2f}'),
     ]:
         fig_box.add_annotation(
             x=_xv, xref='x',
