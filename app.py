@@ -271,9 +271,9 @@ app.layout = html.Div([
                     filter_row(('Domain', domain_dd('t2-domain')), ('Funding Stage', stage_dd('t2-stage'))),
                     card([
                         html.H3('Section A — Quantitative Frequency Distribution', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
-                        html.Div([section_label('Select Numeric Variable'),
+                        html.Div([section_label('Select Continuous Variable'),
                                   dcc.Dropdown(id='t2-num-var',
-                                               options=[{'label': NUMERIC_LABELS[v], 'value': v} for v in NUMERIC_VARS],
+                                               options=[{'label': CONTINUOUS_LABELS[v], 'value': v} for v in CONTINUOUS_VARS],
                                                value='competitiveness_score', clearable=False,
                                                style={'fontSize': '13px', 'marginBottom': '16px'})]),
                         html.Div([
