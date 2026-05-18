@@ -12,20 +12,38 @@ warnings.filterwarnings('ignore')
 # ─── Load Data ────────────────────────────────────────────────────────────────
 df = pd.read_csv('student_entrepreneurial_projects.csv')
 
-# Pre-train multiple regression model
-FEATURES = ['mentor_feedback_score', 'technical_skill_score', 'business_skill_score',
-            'avg_team_experience', 'team_size',
-            'market_growth_rate', 'competition_level']
-X_all = df[FEATURES]
-y_all = df['competitiveness_score']
-reg_model = LinearRegression().fit(X_all, y_all)
-
 NUMERIC_VARS = [
     'competitiveness_score', 'market_size_usd', 'market_growth_rate',
     'team_size', 'technical_skill_score', 'business_skill_score',
     'social_media_mentions', 'mentor_feedback_score',
     'avg_team_experience', 'competition_level', 'user_interest_score'
 ]
+
+# Step 1: Compute Pearson r with competitiveness_score for all numeric variables
+corr_matrix_pre = df[NUMERIC_VARS].corr()
+corr_with_target = corr_matrix_pre['competitiveness_score'].drop('competitiveness_score')
+
+# Step 2: Keep only features where abs(r) >= 0.1
+FEATURES = corr_with_target[corr_with_target.abs() >= 0.1].index.tolist()
+print("Variables passing the correlation threshold (|r| >= 0.1):", FEATURES)
+
+# Step 3: Rebuild the regression model using only these features
+X_all = df[FEATURES]
+y_all = df['competitiveness_score']
+reg_model = LinearRegression().fit(X_all, y_all)
+
+slider_info = {
+    'mentor_feedback_score': ('Mentor Feedback Score (1–10)', 1, 10, 1, 5, 'sl-mentor', {i: str(i) for i in range(1, 11, 2)}),
+    'technical_skill_score': ('Technical Skill Score (0–10)', 0, 10, 1, 5, 'sl-tech', {i: str(i) for i in range(0, 11, 2)}),
+    'business_skill_score': ('Business Skill Score (0–10)', 0, 10, 1, 5, 'sl-bus', {i: str(i) for i in range(0, 11, 2)}),
+    'avg_team_experience': ('Avg Team Experience (0–5 yrs)', 0, 5, 0.5, 2.5, 'sl-exp', {i: str(i) for i in range(0, 6)}),
+    'team_size': ('Team Size (1–6)', 1, 6, 1, 3, 'sl-team', {i: str(i) for i in range(1, 7)}),
+    'market_growth_rate': ('Market Growth Rate (0–25%)', 0, 25, 0.5, 12.5, 'sl-growth', {i: str(i) for i in range(0, 26, 5)}),
+    'competition_level': ('Competition Level (0–10)', 0, 10, 1, 5, 'sl-comp', {i: str(i) for i in range(0, 11, 2)}),
+    'market_size_usd': ('Market Size USD', 0, 1000000, 10000, 100000, 'sl-market_size', {0: '0', 500000: '500k', 1000000: '1M'}),
+    'social_media_mentions': ('Social Media Mentions', 0, 10000, 100, 1000, 'sl-social', {0: '0', 5000: '5k', 10000: '10k'}),
+    'user_interest_score': ('User Interest Score (0–10)', 0, 10, 1, 5, 'sl-interest', {i: str(i) for i in range(0, 11, 2)}),
+}
 NUMERIC_LABELS = {
     'competitiveness_score': 'Competitiveness Score',
     'market_size_usd': 'Market Size (USD)',
@@ -336,6 +354,11 @@ app.layout = html.Div([
                         html.Div(id='t3-ci-table'),
                     ]),
                     card([
+                        html.H3('Section B3 — Correlation Matrix', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
+                        dcc.Graph(id='t3-corr-heatmap', config={'displayModeBar': False}, style={'height': '500px'}),
+                        dcc.Graph(id='t3-corr-bar', config={'displayModeBar': False}, style={'height': '380px', 'marginTop': '20px'}),
+                    ]),
+                    card([
                         html.H3('Section C — Grouped Box Plot by Education Level', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         dcc.Graph(id='t3-edbox', config={'displayModeBar': False}, style={'height': '320px'}),
                     ]),
@@ -450,34 +473,14 @@ app.layout = html.Div([
                         html.H3('Section B — Multiple Regression Predictor', style={'fontSize': '15px', 'color': TEXT, 'marginBottom': '4px'}),
                         html.Div([
                             html.Div([
-                                html.Div([section_label('Mentor Feedback Score (1–10)'),
-                                          dcc.Slider(1, 10, 1, value=5, id='sl-mentor',
-                                                    marks={i: str(i) for i in range(1, 11, 2)},
-                                                    tooltip={"placement": "bottom", "always_visible": True})], style={'marginBottom': '24px'}),
-                                html.Div([section_label('Technical Skill Score (0–10)'),
-                                          dcc.Slider(0, 10, 1, value=5, id='sl-tech',
-                                                    marks={i: str(i) for i in range(0, 11, 2)},
-                                                    tooltip={"placement": "bottom", "always_visible": True})], style={'marginBottom': '24px'}),
-                                html.Div([section_label('Business Skill Score (0–10)'),
-                                          dcc.Slider(0, 10, 1, value=5, id='sl-bus',
-                                                    marks={i: str(i) for i in range(0, 11, 2)},
-                                                    tooltip={"placement": "bottom", "always_visible": True})], style={'marginBottom': '24px'}),
-                                html.Div([section_label('Avg Team Experience (0–5 yrs)'),
-                                          dcc.Slider(0, 5, 0.5, value=2.5, id='sl-exp',
-                                                    marks={i: str(i) for i in range(0, 6)},
-                                                    tooltip={"placement": "bottom", "always_visible": True})], style={'marginBottom': '24px'}),
-                                html.Div([section_label('Team Size (1–6)'),
-                                          dcc.Slider(1, 6, 1, value=3, id='sl-team',
-                                                    marks={i: str(i) for i in range(1, 7)},
-                                                    tooltip={"placement": "bottom", "always_visible": True})], style={'marginBottom': '24px'}),
-                                html.Div([section_label('Market Growth Rate (0–25%)'),
-                                          dcc.Slider(0, 25, 0.5, value=12.5, id='sl-growth',
-                                                    marks={i: str(i) for i in range(0, 26, 5)},
-                                                    tooltip={"placement": "bottom", "always_visible": True})], style={'marginBottom': '24px'}),
-                                html.Div([section_label('Competition Level (0–10)'),
-                                          dcc.Slider(0, 10, 1, value=5, id='sl-comp',
-                                                    marks={i: str(i) for i in range(0, 11, 2)},
-                                                    tooltip={"placement": "bottom", "always_visible": True})]),
+                                html.P(f"Model uses {len(FEATURES)} features (r ≥ 0.1): " + ", ".join([f"{NUMERIC_LABELS.get(f, f)} ({corr_with_target[f]:.2f})" for f in FEATURES]),
+                                       style={'fontSize': '12px', 'color': PRIMARY, 'marginBottom': '16px', 'background': 'rgba(139, 79, 122, 0.08)', 'padding': '8px', 'borderRadius': '6px'}),
+                                *[html.Div([
+                                    section_label(slider_info[f][0]),
+                                    dcc.Slider(slider_info[f][1], slider_info[f][2], slider_info[f][3],
+                                               value=slider_info[f][4], id=slider_info[f][5], marks=slider_info[f][6],
+                                               tooltip={"placement": "bottom", "always_visible": True})
+                                  ], style={'marginBottom': '24px'}) for f in FEATURES]
                             ], style={'flex': '40', 'minWidth': '260px', 'background': PANEL_BG,
                                       'borderRadius': '8px', 'padding': '20px', 'border': f'1px solid {BORDER}'}),
                             html.Div([
@@ -792,6 +795,57 @@ def tab3_histogram(var):
     return fig_mm
 
 
+@app.callback(
+    Output('t3-corr-heatmap', 'figure'),
+    Output('t3-corr-bar', 'figure'),
+    Input('main-tabs', 'value')
+)
+def tab3_correlation(_):
+    c_matrix = df[NUMERIC_VARS].corr()
+    
+    # Custom colorscale: Red (negative) -> Light Grey (zero) -> Purple (positive)
+    custom_colorscale = [
+        [0.0, '#e05c6a'],  # App's RED
+        [0.5, '#f5f6f8'],  # Light neutral grey
+        [1.0, '#8b4f7a']   # App's PRIMARY purple
+    ]
+    
+    fig_heat = go.Figure(data=go.Heatmap(
+        z=c_matrix.values,
+        x=c_matrix.columns,
+        y=c_matrix.index,
+        colorscale=custom_colorscale,
+        zmin=-1, zmax=1,
+        text=np.round(c_matrix.values, 2),
+        texttemplate='%{text}',
+        hoverinfo='z',
+        xgap=1.5,
+        ygap=1.5
+    ))
+    fig_heat.update_layout(**CHART_LAYOUT, title='Correlation Matrix — All Numeric Variables')
+    fig_heat.update_layout(
+        margin=dict(l=150, b=100, t=50, r=20),
+        plot_bgcolor='#e8e8e8'  # Use BORDER color as background so gaps act as borders
+    )
+
+    corr_target = c_matrix['competitiveness_score'].drop('competitiveness_score').sort_values(ascending=False)
+    fig_bar = go.Figure(data=go.Bar(
+        x=corr_target.values,
+        y=corr_target.index,
+        orientation='h',
+        marker=dict(
+            color=corr_target.values,
+            colorscale=custom_colorscale,
+            cmin=-1, cmax=1
+        )
+    ))
+    fig_bar.update_layout(**CHART_LAYOUT, title='Correlation with Competitiveness Score (Ranked)',
+                          yaxis=dict(autorange='reversed'))
+    fig_bar.update_layout(margin=dict(l=150, t=50, r=20, b=50))
+
+    return fig_heat, fig_bar
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # CALLBACKS — TAB 4
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -970,6 +1024,22 @@ def tab5_regression(x_var, y_var):
         html.Td(interp, style={'padding': '7px 10px', 'fontSize': '12px', 'color': PRIMARY,
                                 'border': f'1px solid {BORDER}', 'background': '#ffffff', 'fontWeight': '600'}),
     ]))
+    
+    if abs(r_val) >= 0.7:
+        r_color = GREEN
+    elif abs(r_val) >= 0.3:
+        r_color = AMBER
+    else:
+        r_color = RED
+        
+    badge = html.Span(f'r = {r_val:.4f}', style={'background': r_color, 'color': '#fff', 'borderRadius': '12px', 'padding': '3px 8px', 'fontSize': '11px', 'fontWeight': '600'})
+    
+    tbl_rows.append(html.Tr([
+        html.Td('Correlation Strength', style={'padding': '7px 10px', 'fontSize': '12px', 'color': TEXT_SEC,
+                                          'border': f'1px solid {BORDER}', 'background': '#f9f9f9', 'fontWeight': '500'}),
+        html.Td(badge, style={'padding': '7px 10px', 'border': f'1px solid {BORDER}', 'background': '#f9f9f9'}),
+    ]))
+    
     stats_tbl = html.Table(html.Tbody(tbl_rows), style={'width': '100%', 'borderCollapse': 'collapse'})
     return fig, stats_tbl
 
@@ -977,27 +1047,25 @@ def tab5_regression(x_var, y_var):
 @app.callback(
     Output('pred-output', 'children'),
     Output('pred-scatter', 'figure'),
-    Input('sl-mentor', 'value'),
-    Input('sl-tech', 'value'),
-    Input('sl-bus', 'value'),
-    Input('sl-exp', 'value'),
-    Input('sl-team', 'value'),
-    Input('sl-growth', 'value'),
-    Input('sl-comp', 'value'),
+    [Input(slider_info[f][5], 'value') for f in FEATURES]
 )
-def tab5_predict(mentor, tech, bus, exp, team, growth, comp):
-    input_df = pd.DataFrame([[mentor, tech, bus, exp, team, growth, comp]], columns=FEATURES)
+def tab5_predict(*args):
+    input_df = pd.DataFrame([args], columns=FEATURES)
     pred = float(reg_model.predict(input_df)[0])
     score_min = float(df['competitiveness_score'].min())
     score_max = float(df['competitiveness_score'].max())
     pred = max(score_min, min(score_max, pred))
+    
+    plot_feat = FEATURES[0] if len(FEATURES) > 0 else 'mentor_feedback_score'
+    plot_val = args[0] if len(FEATURES) > 0 else 5
+    
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df['mentor_feedback_score'], y=df['competitiveness_score'],
+    fig.add_trace(go.Scatter(x=df[plot_feat], y=df['competitiveness_score'],
                              mode='markers', marker=dict(color=PRIMARY_LIGHT, size=4, opacity=0.4), name='Actual data'))
-    fig.add_trace(go.Scatter(x=[mentor], y=[pred], mode='markers',
+    fig.add_trace(go.Scatter(x=[plot_val], y=[pred], mode='markers',
                              marker=dict(color=RED, size=16, symbol='star'), name='Your prediction'))
-    fig.update_layout(**CHART_LAYOUT, title='Mentor Feedback Score vs Competitiveness (★ = your prediction)',
-                      xaxis_title='Mentor Feedback Score', yaxis_title='Competitiveness Score')
+    fig.update_layout(**CHART_LAYOUT, title=f'{NUMERIC_LABELS.get(plot_feat, plot_feat)} vs Competitiveness (★ = your prediction)',
+                      xaxis_title=NUMERIC_LABELS.get(plot_feat, plot_feat), yaxis_title='Competitiveness Score')
     return f'{pred:.2f}', fig
 
 
