@@ -36,45 +36,6 @@ The dashboard is structured into five cohesive analytical layers:
 
 ---
 
-## Dashboard Screenshots
-
-### Tab 1: Overview Dashboard
-High-level visual exploration with interactive filters, key performance metrics, and distribution visualizations.
-![Overview Dashboard](./screenshots/tab1-overview.png)
-
-### Tab 2: Frequency & Distributions
-Quantitative and qualitative frequency distributions with dynamic histograms and frequency tables.
-![Frequency & Distributions](./screenshots/tab2-frequency.png)
-
-### Tab 3: EDA & Shape of Data
-Box plots, statistical summaries, confidence intervals, correlation matrices, and distribution analysis.
-![EDA & Shape of Data](./screenshots/tab3-eda.png)
-
-### Tab 4: Probability Distributions
-Interactive visualizations of Normal, Binomial, and Poisson distributions with configurable parameters.
-![Probability Distributions](./screenshots/tab4-probability.png)
-
-### Tab 5: Regression & Predictions
-Simple and multiple linear regression analysis with real-time prediction capabilities.
-![Regression & Predictions](./screenshots/tab5-regression.png)
-
-#### Capturing Screenshots
-To capture and save dashboard screenshots automatically, use the provided script:
-
-```bash
-# Make sure the dashboard is running (in another terminal)
-python app.py
-
-# Run the screenshot capture script (requires Selenium and ChromeDriver)
-python capture_screenshots.py
-```
-
-**Requirements for automated screenshot capture:**
-- Selenium: `pip install selenium`
-- ChromeDriver: Download from https://chromedriver.chromium.org/
-
----
-
 ## Mathematical and Statistical Foundations
 
 The calculations driving the dashboard rely on the following mathematical formulations:
