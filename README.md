@@ -1,5 +1,9 @@
 # Student Entrepreneurial Projects Analysis Dashboard
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Dashboard-brightgreen?style=for-the-badge&logo=python)](https://azzzka.pythonanywhere.com/)
+
+> 🚀 **[Click here to open the live dashboard](https://azzzka.pythonanywhere.com/)**
+
 An interactive, premium Plotly Dash analytical dashboard designed to explore student entrepreneurial competitiveness. This application utilizes rigorous probability distributions, descriptive statistics, and dynamic regression modeling to evaluate how team composition, market growth, and core skill sets influence project success.
 
 ---
